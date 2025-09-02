@@ -35,15 +35,15 @@ pico_sdk_init()
 
 include(FreeRTOS_Kernel_import.cmake)
 
+# Найти все файлы .c и .cpp в директории src
+file(GLOB_RECURSE PROJECT_SOURCES "src/*.c")
+
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(innopol-assigment innopol-assigment.c )
+add_executable(innopol-assigment innopol-assigment.c  ${PROJECT_SOURCES})
 
 pico_set_program_name(innopol-assigment "innopol-assigment")
 pico_set_program_version(innopol-assigment "0.1")
-
-# Generate PIO header
-pico_generate_pio_header(innopol-assigment ${CMAKE_CURRENT_LIST_DIR}/blink.pio)
 
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(innopol-assigment 1)
@@ -56,12 +56,11 @@ target_link_libraries(innopol-assigment
 # Add the standard include files to the build
 target_include_directories(innopol-assigment PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/inc
 )
 
 # Add any user requested libraries
 target_link_libraries(innopol-assigment 
-        hardware_dma
-        hardware_pio
         hardware_timer
         pico_cyw43_arch_none
         FreeRTOS-Kernel-Heap4

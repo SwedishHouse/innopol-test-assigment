@@ -18,10 +18,18 @@ typedef struct
 
 void bb_attach(uint8_t* buffer, size_t buffer_size);
 
+// ≈сть ли место дл€ того, что бы положить еще байты
+bool bb_is_avail(void);
+
+// „исло необработанных байт в массиве
+size_t bb_unhandled(void);
+
+// —бросим указатели чтени€ и записи в начало
+void bb_reject(void);
+
+
 size_t bb_get_size();
 size_t bb_get_data_lenth();
-
-void bb_read(void);
 
 void bb_add(uint8_t byte);
 

@@ -9,15 +9,10 @@ void bb_attach(uint8_t* buffer, size_t buffer_size)
     bb.index_read = bb.index_write = 0;
 }
 
-void bb_read(void)
-{
-    
-}
-
 void bb_add(uint8_t byte)
 {
     // Кольцевой буфер
-    bb.data[bb.index_write++%bb.data_size] = byte;
+    bb.data[bb.index_write++] = byte;
 }
 
 size_t bb_get_size()
@@ -30,12 +25,24 @@ size_t bb_get_data_lenth()
     return bb.index_write;
 }
 
+void bb_reject(void)
+{
+    bb.index_read = bb.index_write = 0;
+}
+
+bool bb_is_avail(void)
+{
+    return (bb.data_size - bb.index_write) > 0;
+}
+
+size_t bb_unhandled(void)
+{
+    return bb.index_write - bb.index_read;
+}
+
 uint8_t bb_get_uint8()
 {
-    uint8_t res = bb.data[bb.index_read];
-    bb.index_read++;
-    bb.index_read %= bb.data_size;
-    return res;
+    return bb.data[bb.index_read++];
 }
 
 uint16_t bb_get_uint16()
@@ -44,6 +51,6 @@ uint16_t bb_get_uint16()
 }
 uint32_t bb_get_uint32()
 {
-    return  bb_get_uint16() |
+    return  bb_get_uint16() << 16 |
             bb_get_uint16();
 }

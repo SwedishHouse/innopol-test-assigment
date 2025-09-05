@@ -3,7 +3,9 @@
 
 #include "bb.h"
 
-void channel_lvl_init(bb_t const * byte_buffer);
+// Библиотека работы канального уровня
+
+void channel_lvl_init(bb_t  * const serial_buffer, bb_t * const reply_buffer);
 
 void channel_lvl_proccess(void);
 

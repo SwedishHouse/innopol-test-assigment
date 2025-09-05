@@ -18,12 +18,16 @@
 #define UART_TX_PIN 8
 #define UART_RX_PIN 9
 
+// —сылка на байтовый буфер
+static bb_t * serial_bb;
+
 // RX interrupt handler
 void on_uart_rx() {
     while (uart_is_readable(UART_ID)) {
-        bb_add((uint8_t) uart_getc(UART_ID));
+        bb_add(serial_bb, (uint8_t) uart_getc(UART_ID));
     }
 }
+
 
 
 void serial_init(uint8_t * data, size_t data_size)
@@ -31,7 +35,7 @@ void serial_init(uint8_t * data, size_t data_size)
     assert(data != NULL);
     assert(data_size != 0);
 
-    bb_attach(data, data_size);
+    bb_attach(serial_bb, data, data_size);
 
         // Set up our UART with a basic baud rate.
     uart_init(UART_ID, BAUD_RATE);

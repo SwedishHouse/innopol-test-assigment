@@ -1,56 +1,87 @@
 #include "bb.h"
+#include "string.h"
 
-static bb_t bb = {0};
-
-void bb_attach(uint8_t* buffer, size_t buffer_size)
+void bb_attach(bb_t * const bb, uint8_t* data, size_t buffer_size)
 {
-    bb.data = buffer;
-    bb.data_size = buffer_size;
-    bb.index_read = bb.index_write = 0;
+    assert(bb != NULL);
+    assert(data != NULL);
+    assert(buffer_size != 0);
+    
+    bb->data = data;
+    bb->data_size = buffer_size;
+    bb->index_read = bb->index_write = 0;
 }
 
-void bb_add(uint8_t byte)
+uint8_t bb_add(bb_t * const bb, uint8_t byte)
 {
-    // Кольцевой буфер
-    bb.data[bb.index_write++] = byte;
+    if(!bb_is_avail(bb))
+        return 0;
+    // Положили байт в буффер
+    bb->data[bb->index_write++] = byte;
+    return 1;
 }
 
-size_t bb_get_size()
+// Добавление указанного количества байт
+size_t bb_add_bytes(bb_t * const bb, const uint8_t *bytes, size_t size)
 {
-    return bb.data_size;
+    assert(bb != NULL);
+    assert(bytes != NULL);
+
+    if (size >= bb_availlable(bb))
+        return 0;
+
+    memcpy(bb->data + bb->index_write, bytes, size);
+    
+    return size;
 }
 
-size_t bb_get_data_lenth()
+size_t bb_availlable(bb_t * const bb)
 {
-    return bb.index_write;
+    return bb_get_size(bb) - bb_get_data_lenth(bb);
 }
 
-void bb_reject(void)
+size_t bb_get_size(bb_t * const bb)
 {
-    bb.index_read = bb.index_write = 0;
+    assert(bb != NULL);
+    return bb->data_size;
 }
 
-bool bb_is_avail(void)
+size_t bb_get_data_lenth(bb_t * const bb)
 {
-    return (bb.data_size - bb.index_write) > 0;
+    assert(bb != NULL);
+    return bb->index_write;
 }
 
-size_t bb_unhandled(void)
+void bb_reject(bb_t * const bb)
 {
-    return bb.index_write - bb.index_read;
+    assert(bb != NULL);
+    bb->index_read = bb->index_write = 0;
 }
 
-uint8_t bb_get_uint8()
+bool bb_is_avail(bb_t * const bb)
 {
-    return bb.data[bb.index_read++];
+    assert(bb != NULL);
+    return (bb->data_size - bb->index_write) > 0;
 }
 
-uint16_t bb_get_uint16()
+size_t bb_unhandled(bb_t * const bb)
 {
-    return bb_get_uint8() << 8 | bb_get_uint8();
+    assert(bb != NULL);
+    return bb->index_write - bb->index_read;
 }
-uint32_t bb_get_uint32()
+
+uint8_t bb_get_uint8(bb_t * const bb)
 {
-    return  bb_get_uint16() << 16 |
-            bb_get_uint16();
+    assert(bb != NULL);
+    return bb->data[bb->index_read++];
+}
+
+uint16_t bb_get_uint16(bb_t * const bb)
+{
+    return bb_get_uint8(bb) << 8 | bb_get_uint8(bb);
+}
+uint32_t bb_get_uint32(bb_t * const bb)
+{
+    return  bb_get_uint16(bb) << 16 |
+            bb_get_uint16(bb);
 }

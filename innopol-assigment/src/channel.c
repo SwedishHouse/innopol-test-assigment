@@ -147,18 +147,20 @@ void channel_proccess_input(void)
                     bb_reject(channel_bb_reply);
                 }
                 
-                
-                // Копирование в буфер транспортного уровня
-                const uint8_t data_byte = bb_get_uint8(channel_bb_ser);
-                bb_add(channel_bb_reply, data_byte);
-                // Инкремент суммы 
-                channel_crc += data_byte;
+                {
+                    // Копирование в буфер транспортного уровня
+                    const uint8_t data_byte = bb_get_uint8(channel_bb_ser);
+                    bb_add(channel_bb_reply, data_byte);
+                    // Инкремент суммы 
+                    channel_crc += data_byte;
+                }
                 // уберем уже обработанные данные
                 channel_packet_size -= 1;
                 
                 break;
 
                 case CHANNEL_STATE_NEED_MESSAGE_CRC:
+                {
                     const uint8_t data_byte = bb_get_uint8(channel_bb_ser);
                     // Инкремент суммы 
                     if(channel_crc != data_byte)
@@ -172,9 +174,11 @@ void channel_proccess_input(void)
                     // уберем уже обработанные данные
                     channel_packet_size -= 1;
                     channel_state = CHANNEL_STATE_NEED_STOP;
+                }
                 break;
 
                 case CHANNEL_STATE_NEED_STOP:
+                {
                     const uint8_t data_byte = bb_get_uint8(channel_bb_ser);
                     // Инкремент суммы 
                     if(data_byte != CHANNEL_STOP_BYTE)
@@ -193,10 +197,8 @@ void channel_proccess_input(void)
                     channel_reject();
                     // Отправка сообщения на транспортный уровень
                     channel_packet_rec();
-
+                }
                 break;
-
-
             default:
                 assert(0);
                 break;

@@ -11,7 +11,7 @@ void channel_init(bb_t * const serial_buffer, bb_t * const reply_buffer, channel
 
 void channel_proccess_input(void);
 
-void channel_proccess_output(const uint8_t * data, size_t data_size);
+void channel_process_output(const uint8_t * data, size_t data_size);
 
 void channel_start(void);
 

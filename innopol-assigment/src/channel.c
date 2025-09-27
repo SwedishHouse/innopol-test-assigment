@@ -239,7 +239,7 @@ void channel_discard(void)
 
 #define CHANNEL_OUT_BUFFER_SIZE 1024
 
-void channel_proccess_output(const uint8_t * data, size_t data_size)
+void channel_process_output(const uint8_t * data, size_t data_size)
 {
     static uint8_t out_buffer[CHANNEL_OUT_BUFFER_SIZE];
 
